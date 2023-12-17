@@ -2,14 +2,14 @@
 
 namespace MeltySynth
 {
-    internal sealed class Channel
+    public sealed class Channel
     {
         private readonly Synthesizer synthesizer;
         private readonly bool isPercussionChannel;
 
         private int bankNumber;
         private int patchNumber;
-
+            
         private short modulation;
         private short volume;
         private short pan;

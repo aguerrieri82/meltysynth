@@ -595,6 +595,6 @@ namespace MeltySynth
         }
 
         internal int MinimumVoiceDuration => minimumVoiceDuration;
-        internal Channel[] Channels => channels;
+        public Channel[] Channels => channels;
     }
 }
