@@ -36,7 +36,7 @@ namespace MeltySynth
 
             if (useMemoryMap)
             {
-                _mmFile = MemoryMappedFile.CreateFromFile(path, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
+                _mmFile = MemoryMappedFile.CreateFromFile(path);
                 using var reader = new FileMapReader(_mmFile);
                 Load(reader);
             }
