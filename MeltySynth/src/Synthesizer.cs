@@ -12,7 +12,7 @@ namespace MeltySynth
     /// If you want to send notes and render the waveform in separate threads,
     /// you must make sure that the methods are not called at the same time.
     /// </remarks>
-    public sealed class Synthesizer : IAudioRenderer
+    public sealed class Synthesizer : IAudioRenderer, IDisposable
     {
         private static readonly int channelCount = 16;
         private static readonly int percussionChannel = 9;
@@ -542,6 +542,11 @@ namespace MeltySynth
                 var step = inverseBlockSize * (currentGain - previousGain);
                 ArrayMath.MultiplyAdd(previousGain, step, source, destination);
             }
+        }
+
+        public void Dispose()
+        {
+            soundFont.Dispose();
         }
 
         /// <summary>

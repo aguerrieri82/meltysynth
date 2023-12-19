@@ -14,7 +14,6 @@ namespace MeltySynth
 
         byte ReadByte();
 
-
         ushort ReadUInt16();
 
         short ReadInt16();

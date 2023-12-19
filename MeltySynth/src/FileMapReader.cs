@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MeltySynth
 {
-    internal class FileMapReader : IFileReader
+    public class FileMapReader : IFileReader
     {
         MemoryMappedFile _file;
         MemoryMappedViewAccessor _view;

@@ -8,16 +8,14 @@ namespace MeltySynth
     public unsafe class FileMapSamplesBuffer : ISamplesBuffer
     {
         long _length;
-        MemoryMappedFile _file;
         short* _dataPointer;
-        MemoryMappedViewStream _view;
+        MemoryMappedViewAccessor _view;
         bool _isDisposed;
 
         public FileMapSamplesBuffer(MemoryMappedFile file, long position, long length)
         {
-            _file = file;
             _length = length;
-            _view = file.CreateViewStream();
+            _view = file.CreateViewAccessor();
 
             byte* ptr = null;
             _view.SafeMemoryMappedViewHandle.AcquirePointer(ref ptr);

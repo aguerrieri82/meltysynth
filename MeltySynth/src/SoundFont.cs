@@ -11,7 +11,7 @@ namespace MeltySynth
     /// <summary>
     /// Reperesents a SoundFont.
     /// </summary>
-    public sealed class SoundFont
+    public sealed class SoundFont : IDisposable
     {
         private SoundFontInfo info;
         private int bitsPerSample;
@@ -19,7 +19,7 @@ namespace MeltySynth
         private SampleHeader[] sampleHeaders;
         private Preset[] presets;
         private Instrument[] instruments;
-
+        private MemoryMappedFile? _mmFile;
 
         /// <summary>
         /// Loads a SoundFont from the file.
@@ -36,8 +36,8 @@ namespace MeltySynth
 
             if (useMemoryMap)
             {
-                var file = MemoryMappedFile.CreateFromFile(path);
-                var reader = new FileMapReader(file);
+                _mmFile = MemoryMappedFile.CreateFromFile(path, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
+                using var reader = new FileMapReader(_mmFile);
                 Load(reader);
             }
             else
@@ -158,6 +158,13 @@ namespace MeltySynth
                     }
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            waveData.Dispose();
+            _mmFile?.Dispose();
+            _mmFile = null;
         }
 
         /// <summary>
