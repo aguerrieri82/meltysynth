@@ -8,13 +8,13 @@ namespace MeltySynth
         private readonly GeneratorType type;
         private readonly ushort value;
 
-        private Generator(BinaryReader reader)
+        private Generator(IFileReader reader)
         {
             type = (GeneratorType)reader.ReadUInt16();
             value = reader.ReadUInt16();
         }
 
-        internal static Generator[] ReadFromChunk(BinaryReader reader, int size)
+        internal static Generator[] ReadFromChunk(IFileReader reader, int size)
         {
             if (size % 4 != 0)
             {

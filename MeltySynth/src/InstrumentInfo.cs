@@ -9,13 +9,13 @@ namespace MeltySynth
         private int zoneStartIndex;
         private int zoneEndIndex;
 
-        private InstrumentInfo(BinaryReader reader)
+        private InstrumentInfo(IFileReader reader)
         {
             name = reader.ReadFixedLengthString(20);
             zoneStartIndex = reader.ReadUInt16();
         }
 
-        internal static InstrumentInfo[] ReadFromChunk(BinaryReader reader, int size)
+        internal static InstrumentInfo[] ReadFromChunk(IFileReader reader, int size)
         {
             if (size % 22 != 0)
             {

@@ -57,7 +57,7 @@ namespace MeltySynth
         /// </summary>
         /// <param name="soundFontPath">The SoundFont file name and path.</param>
         /// <param name="sampleRate">The sample rate for synthesis.</param>
-        public Synthesizer(string soundFontPath, int sampleRate) : this(new SoundFont(soundFontPath), new SynthesizerSettings(sampleRate))
+        public Synthesizer(string soundFontPath, int sampleRate, bool useMemoryMap) : this(new SoundFont(soundFontPath, useMemoryMap), new SynthesizerSettings(sampleRate))
         {
         }
 

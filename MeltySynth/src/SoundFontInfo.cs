@@ -20,7 +20,7 @@ namespace MeltySynth
         private readonly string comments = string.Empty;
         private readonly string tools = string.Empty;
 
-        internal SoundFontInfo(BinaryReader reader)
+        internal SoundFontInfo(IFileReader reader)
         {
             var chunkId = reader.ReadFourCC();
             if (chunkId != "LIST")
@@ -29,7 +29,7 @@ namespace MeltySynth
             }
 
             var end = (long)reader.ReadInt32();
-            end += reader.BaseStream.Position;
+            end += reader.Position;
 
             var listType = reader.ReadFourCC();
             if (listType != "INFO")
@@ -37,7 +37,7 @@ namespace MeltySynth
                 throw new InvalidDataException($"The type of the LIST chunk must be 'INFO', but was '{listType}'.");
             }
 
-            while (reader.BaseStream.Position < end)
+            while (reader.Position < end)
             {
                 var id = reader.ReadFourCC();
                 var size = reader.ReadInt32();

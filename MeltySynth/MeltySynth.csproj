@@ -15,6 +15,7 @@
     <PackageReleaseNotes>https://github.com/sinshu/meltysynth/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <Version>2.4.1</Version>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

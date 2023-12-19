@@ -15,7 +15,7 @@ namespace MeltySynth
 
         private readonly Synthesizer synthesizer;
 
-        private short[]? data;
+        private ISamplesBuffer? data;
         private LoopMode loopMode;
         private int sampleRate;
         private int start;
@@ -37,7 +37,7 @@ namespace MeltySynth
             this.synthesizer = synthesizer;
         }
 
-        public void Start(short[] data, LoopMode loopMode, int sampleRate, int start, int end, int startLoop, int endLoop, int rootKey, int coarseTune, int fineTune, int scaleTuning)
+        public void Start(ISamplesBuffer data, LoopMode loopMode, int sampleRate, int start, int end, int startLoop, int endLoop, int rootKey, int coarseTune, int fineTune, int scaleTuning)
         {
             this.data = data;
             this.loopMode = loopMode;

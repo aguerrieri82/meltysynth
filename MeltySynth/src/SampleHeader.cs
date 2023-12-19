@@ -26,7 +26,7 @@ namespace MeltySynth
             name = "Default";
         }
 
-        private SampleHeader(BinaryReader reader)
+        private SampleHeader(IFileReader reader)
         {
             name = reader.ReadFixedLengthString(20);
             start = reader.ReadInt32();
@@ -40,7 +40,7 @@ namespace MeltySynth
             type = (SampleType)reader.ReadUInt16();
         }
 
-        internal static SampleHeader[] ReadFromChunk(BinaryReader reader, int size)
+        internal static SampleHeader[] ReadFromChunk(IFileReader reader, int size)
         {
             if (size % 46 != 0)
             {

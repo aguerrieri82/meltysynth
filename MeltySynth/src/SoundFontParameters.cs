@@ -9,7 +9,7 @@ namespace MeltySynth
         private readonly Preset[] presets;
         private readonly Instrument[] instruments;
 
-        internal SoundFontParameters(BinaryReader reader)
+        internal SoundFontParameters(IFileReader reader)
         {
             var chunkId = reader.ReadFourCC();
             if (chunkId != "LIST")
@@ -18,7 +18,7 @@ namespace MeltySynth
             }
 
             var end = (long)reader.ReadInt32();
-            end += reader.BaseStream.Position;
+            end += reader.Position;
 
             var listType = reader.ReadFourCC();
             if (listType != "pdta")
@@ -33,7 +33,7 @@ namespace MeltySynth
             ZoneInfo[]? instrumentBag = null;
             Generator[]? instrumentGenerators = null;
 
-            while (reader.BaseStream.Position < end)
+            while (reader.Position < end)
             {
                 var id = reader.ReadFourCC();
                 var size = reader.ReadInt32();

@@ -1,7 +1,9 @@
-﻿using System;
+﻿using MeltySynth.src;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Text;
 
 namespace MeltySynth
@@ -13,33 +15,11 @@ namespace MeltySynth
     {
         private SoundFontInfo info;
         private int bitsPerSample;
-        private short[] waveData;
+        private ISamplesBuffer waveData;
         private SampleHeader[] sampleHeaders;
         private Preset[] presets;
         private Instrument[] instruments;
 
-        /// <summary>
-        /// Loads a SoundFont from the stream.
-        /// </summary>
-        /// <param name="stream">
-        /// The data stream used to load the SoundFont.
-        /// </param>
-        public SoundFont(Stream stream)
-        {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            Load(stream);
-
-            // Workaround for nullable warnings in .NET Standard 2.1.
-            Debug.Assert(info != null);
-            Debug.Assert(waveData != null);
-            Debug.Assert(sampleHeaders != null);
-            Debug.Assert(presets != null);
-            Debug.Assert(instruments != null);
-        }
 
         /// <summary>
         /// Loads a SoundFont from the file.
@@ -47,16 +27,23 @@ namespace MeltySynth
         /// <param name="path">
         /// The SoundFont file name and path.
         /// </param>
-        public SoundFont(string path)
+        public SoundFont(string path, bool useMemoryMap = false)
         {
             if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
             }
 
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            if (useMemoryMap)
             {
-                Load(stream);
+                var file = MemoryMappedFile.CreateFromFile(path);
+                var reader = new FileMapReader(file);
+                Load(reader);
+            }
+            else
+            {
+                using var reader = new StreamFileReader(File.OpenRead(path));
+                Load(reader);
             }
 
             // Workaround for nullable warnings in .NET Standard 2.1.
@@ -67,35 +54,33 @@ namespace MeltySynth
             Debug.Assert(instruments != null);
         }
 
-        private void Load(Stream stream)
+
+        private void Load(IFileReader reader)
         {
-            using (var reader = new BinaryReader(stream, Encoding.ASCII, true))
+            var chunkId = reader.ReadFourCC();
+            if (chunkId != "RIFF")
             {
-                var chunkId = reader.ReadFourCC();
-                if (chunkId != "RIFF")
-                {
-                    throw new InvalidDataException("The RIFF chunk was not found.");
-                }
-
-                var size = reader.ReadInt32();
-
-                var formType = reader.ReadFourCC();
-                if (formType != "sfbk")
-                {
-                    throw new InvalidDataException($"The type of the RIFF chunk must be 'sfbk', but was '{formType}'.");
-                }
-
-                info = new SoundFontInfo(reader);
-
-                var sampleData = new SoundFontSampleData(reader);
-                bitsPerSample = sampleData.BitsPerSample;
-                waveData = sampleData.Samples;
-
-                var parameters = new SoundFontParameters(reader);
-                sampleHeaders = parameters.SampleHeaders;
-                presets = parameters.Presets;
-                instruments = parameters.Instruments;
+                throw new InvalidDataException("The RIFF chunk was not found.");
             }
+
+            var size = reader.ReadUInt32();
+
+            var formType = reader.ReadFourCC();
+            if (formType != "sfbk")
+            {
+                throw new InvalidDataException($"The type of the RIFF chunk must be 'sfbk', but was '{formType}'.");
+            }
+
+            info = new SoundFontInfo(reader);
+
+            var sampleData = new SoundFontSampleData(reader);
+            bitsPerSample = sampleData.BitsPerSample;
+            waveData = sampleData.Samples;
+
+            var parameters = new SoundFontParameters(reader);
+            sampleHeaders = parameters.SampleHeaders;
+            presets = parameters.Presets;
+            instruments = parameters.Instruments;
 
             CheckSamples();
             CheckRegions();
@@ -195,7 +180,7 @@ namespace MeltySynth
         /// This single array contains all the waveform data in the SoundFont.
         /// An instance of <see cref="SampleHeader"/> indicates a range of the array corresponding to a sample.
         /// </remarks>
-        public ReadOnlySpan<short> WaveData => waveData;
+        public ISamplesBuffer WaveData => waveData;
 
         /// <summary>
         /// The samples of the SoundFont.
@@ -213,7 +198,7 @@ namespace MeltySynth
         public IReadOnlyList<Instrument> Instruments => instruments;
 
         // Internally exposes the raw arrays for fast enumeration.
-        internal short[] WaveDataArray => waveData;
+        internal ISamplesBuffer WaveDataArray => waveData;
         internal SampleHeader[] SampleHeaderArray => sampleHeaders;
         internal Preset[] PresetArray => presets;
         internal Instrument[] InstrumentArray => instruments;

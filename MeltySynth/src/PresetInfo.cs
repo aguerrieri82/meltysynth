@@ -14,7 +14,7 @@ namespace MeltySynth
         private int genre;
         private int morphology;
 
-        private PresetInfo(BinaryReader reader)
+        private PresetInfo(IFileReader reader)
         {
             name = reader.ReadFixedLengthString(20);
             patchNumber = reader.ReadUInt16();
@@ -25,7 +25,7 @@ namespace MeltySynth
             morphology = reader.ReadInt32();
         }
 
-        internal static PresetInfo[] ReadFromChunk(BinaryReader reader, int size)
+        internal static PresetInfo[] ReadFromChunk(IFileReader reader, int size)
         {
             if (size % 38 != 0)
             {

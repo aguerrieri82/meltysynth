@@ -4,12 +4,12 @@ namespace MeltySynth
 {
     internal static class RegionEx
     {
-        public static void Start(this Oscillator oscillator, short[] data, InstrumentRegion region)
+        public static void Start(this Oscillator oscillator, ISamplesBuffer data, InstrumentRegion region)
         {
             Start(oscillator, data, new RegionPair(PresetRegion.Default, region));
         }
 
-        public static void Start(this Oscillator oscillator, short[] data, RegionPair region)
+        public static void Start(this Oscillator oscillator, ISamplesBuffer data, RegionPair region)
         {
             var sampleRate = region.Instrument.Sample.SampleRate;
             var loopMode = region.SampleModes;

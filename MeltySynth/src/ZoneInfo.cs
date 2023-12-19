@@ -10,13 +10,13 @@ namespace MeltySynth
         private int generatorCount;
         private int modulatorCount;
 
-        private ZoneInfo(BinaryReader reader)
+        private ZoneInfo(IFileReader reader)
         {
             generatorIndex = reader.ReadUInt16();
             modulatorIndex = reader.ReadUInt16();
         }
 
-        internal static ZoneInfo[] ReadFromChunk(BinaryReader reader, int size)
+        internal static ZoneInfo[] ReadFromChunk(IFileReader reader, int size)
         {
             if (size % 4 != 0)
             {
