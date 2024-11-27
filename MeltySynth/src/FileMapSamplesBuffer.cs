@@ -22,9 +22,10 @@ namespace MeltySynth
             _dataPointer = (short*)(ptr + position);
         }
 
-        public short this[long index] => _dataPointer[index];
-
-        public long Length => _length;
+        public short* Lock(long index)
+        {
+            return _dataPointer + index;
+        }
 
         public void Dispose()
         {
@@ -36,16 +37,16 @@ namespace MeltySynth
             _isDisposed = true;
         }
 
-        public byte[] GetBytes(long pos, int length)
+        public unsafe byte[] GetBytes(long pos, int length)
         {
             var res = new byte[length];
-            var curPtr = ((byte*)_dataPointer) + pos;
-            for (var i = 0; i < length; i++)
-            {
-                res[i] = *curPtr;
-                curPtr++;
-            }
+
+            fixed (byte* pRes = res)
+                Buffer.MemoryCopy(_dataPointer, pRes, length, length);
+
             return res;
         }
+
+        public long Length => _length;
     }
 }

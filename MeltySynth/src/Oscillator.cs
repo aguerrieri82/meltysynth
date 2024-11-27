@@ -93,8 +93,10 @@ namespace MeltySynth
             }
         }
 
-        private bool FillBlock_NoLoop(float[] block, long pitchRatio_fp)
+        private unsafe bool FillBlock_NoLoop(float[] block, long pitchRatio_fp)
         {
+            var pData = data!.Lock(0);
+
             for (var t = 0; t < block.Length; t++)
             {
                 var index = position_fp >> fracBits;
@@ -112,8 +114,8 @@ namespace MeltySynth
                     }
                 }
 
-                var x1 = data![index];
-                var x2 = data![index + 1];
+                var x1 = pData[index];
+                var x2 = pData[index + 1];
                 var a_fp = position_fp & (fracUnit - 1);
                 block[t] = fpToSample * (((long)x1 << fracBits) + a_fp * (x2 - x1));
 
@@ -123,12 +125,14 @@ namespace MeltySynth
             return true;
         }
 
-        private bool FillBlock_Continuous(float[] block, long pitchRatio_fp)
+        private unsafe bool FillBlock_Continuous(float[] block, long pitchRatio_fp)
         {
             var endLoop_fp = (long)endLoop << fracBits;
 
             var loopLength = (long)(endLoop - startLoop);
             var loopLength_fp = loopLength << fracBits;
+
+            var pData = data!.Lock(0);
 
             for (var t = 0; t < block.Length; t++)
             {
@@ -145,8 +149,8 @@ namespace MeltySynth
                     index2 -= loopLength;
                 }
 
-                var x1 = data![index1];
-                var x2 = data![index2];
+                var x1 = pData[index1];
+                var x2 = pData[index2];
                 var a_fp = position_fp & (fracUnit - 1);
                 block[t] = fpToSample * (((long)x1 << fracBits) + a_fp * (x2 - x1));
 

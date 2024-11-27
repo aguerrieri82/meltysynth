@@ -23,7 +23,7 @@ namespace MeltySynthTest
             }
         }
 
-        private void NoLoop_PitchRatio100_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
+        private unsafe void NoLoop_PitchRatio100_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
         {
             Console.WriteLine(instrument.Name + ", " + region.Sample.Name);
 
@@ -52,7 +52,7 @@ namespace MeltySynthTest
             var end = region.SampleEnd;
             var length = end - start;
 
-            var raw = soundFont.WaveDataArray.AsSpan(start, length);
+            var raw = soundFont.WaveDataArray.Lock(start);
             var expected = new float[length];
             for (var i = 0; i < length; i++)
             {
@@ -95,7 +95,7 @@ namespace MeltySynthTest
             }
         }
 
-        private void NoLoop_PitchRatio050_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
+        private unsafe void NoLoop_PitchRatio050_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
         {
             Console.WriteLine(instrument.Name + ", " + region.Sample.Name);
 
@@ -124,7 +124,7 @@ namespace MeltySynthTest
             var end = region.SampleEnd;
             var length = end - start;
 
-            var raw = soundFont.WaveDataArray.AsSpan(start, length + 1);
+            var raw = soundFont.WaveDataArray.Lock(start);
             var expected = new float[2 * length];
             for (var i = 0; i < length; i++)
             {
@@ -169,7 +169,7 @@ namespace MeltySynthTest
             }
         }
 
-        private void Continuous_PitchRatio100_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
+        private unsafe void Continuous_PitchRatio100_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
         {
             Console.WriteLine(instrument.Name + ", " + region.Sample.Name);
 
@@ -198,9 +198,10 @@ namespace MeltySynthTest
             var expected = new float[actual.Count];
 
             var pos = start;
+            var pData = soundFont.WaveDataArray.Lock(0);
             for (var t = 0; t < expected.Length; t++)
             {
-                expected[t] = (float)soundFont.WaveDataArray[pos] / 32768;
+                expected[t] = (float)pData[pos] / 32768;
                 pos++;
                 if (pos == endLoop)
                 {
@@ -232,7 +233,7 @@ namespace MeltySynthTest
             }
         }
 
-        private void Continuous_PitchRatio050_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
+        private unsafe void Continuous_PitchRatio050_Run(SoundFont soundFont, Instrument instrument, InstrumentRegion region)
         {
             Console.WriteLine(instrument.Name + ", " + region.Sample.Name);
 
@@ -261,9 +262,10 @@ namespace MeltySynthTest
             var raw = new float[actual.Count / 2 + 1];
 
             var pos = start;
+            var pData = soundFont.WaveDataArray.Lock(0);
             for (var t = 0; t < raw.Length; t++)
             {
-                raw[t] = (float)soundFont.WaveDataArray[pos] / 32768;
+                raw[t] = (float)pData[pos] / 32768;
                 pos++;
                 if (pos == endLoop)
                 {

@@ -9,7 +9,7 @@ namespace MeltySynthTest
     public class SoundFontWaveDataTest_NAudio
     {
         [TestCaseSource(typeof(TestSettings), nameof(TestSettings.SoundFonts))]
-        public void ReadTest(string soundFontName, MeltySynth.SoundFont soundFont)
+        public unsafe void ReadTest(string soundFontName, MeltySynth.SoundFont soundFont)
         {
             var expected = new NAudio.SoundFont.SoundFont(soundFontName + ".sf2").SampleData;
             var actual = soundFont.WaveDataArray;
@@ -20,9 +20,11 @@ namespace MeltySynthTest
 
             Assert.AreEqual(p.Length, actual.Length);
 
+            var pData = actual.Lock(0);
+
             for (var i = 0; i < p.Length; i++)
             {
-                if (p[i] != actual[i])
+                if (p[i] != pData[i])
                 {
                     Assert.Fail();
                 }
